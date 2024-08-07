@@ -28,6 +28,13 @@ def get_user_input():
     start_date = st.sidebar.date_input("Start Date", value=datetime(2023, 1, 1))
     end_date = st.sidebar.date_input("End Date", value=datetime.today())
 
+    # Format dates for display
+    formatted_start_date = start_date.strftime("%d/%m/%Y")
+    formatted_end_date = end_date.strftime("%d/%m/%Y")
+
+    # Display formatted dates
+    st.sidebar.write(f"Fetching data from: {formatted_start_date} to {formatted_end_date}")
+
     # Select interval
     interval = st.sidebar.selectbox(
         "Interval",

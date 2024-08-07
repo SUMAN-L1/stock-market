@@ -25,7 +25,7 @@ def get_user_input():
         stock_symbol += ".BO"
 
     # Date range inputs
-    start_date = st.sidebar.date_input("Start Date", value=datetime(1990, 1, 1))  # Allowing start date from 1980
+    start_date = st.sidebar.date_input("Start Date", value=datetime(1980, 1, 1))  # Allowing start date from 1980
     end_date = st.sidebar.date_input("End Date", value=datetime.today())
 
     # Ensure end_date is not before start_date
@@ -55,10 +55,17 @@ stock_symbol, start_date, end_date, interval = get_user_input()
 @st.cache_data
 def load_data(symbol, start_date, end_date, interval):
     try:
+        # Download data from Yahoo Finance
         data = yf.download(symbol, start=start_date, end=end_date, interval=interval, progress=False)
+        
+        # Convert datetime.date to pandas Timestamp for comparison
+        start_date_ts = pd.Timestamp(start_date)
+        end_date_ts = pd.Timestamp(end_date)
+
         # Check if the data is within the requested range
-        if data.empty or data.index[0] > end_date or data.index[-1] < start_date:
+        if data.empty or data.index[0] > end_date_ts or data.index[-1] < start_date_ts:
             return pd.DataFrame()  # Return empty DataFrame if no data in the selected range
+        
         return data
     except Exception as e:
         st.error(f"An error occurred: {e}")

@@ -43,10 +43,14 @@ def get_user_input():
     # Display formatted dates
     st.sidebar.write(f"Fetching data from: {formatted_start_date} to {formatted_end_date}")
 
-    # Select interval
+    # Select interval with only Yahoo Finance supported options
+    interval_options = [
+        "1m", "2m", "5m", "15m", "30m", "60m", "90m", "1d", "5d", "1wk", "1mo", "3mo"
+    ]
+    
     interval = st.sidebar.selectbox(
         "Interval",
-        ("1m", "2m", "5m", "15m", "30m", "60m", "90m", "1h", "1d", "5d", "1wk", "1mo", "3mo")
+        interval_options
     )
 
     return stock_symbol, start_date, end_date, interval

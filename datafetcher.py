@@ -25,7 +25,7 @@ def get_user_input():
         stock_symbol += ".BO"
 
     # Date range inputs
-    start_date = st.sidebar.date_input("Start Date", value=datetime(2023, 1, 1))
+    start_date = st.sidebar.date_input("Start Date", value=datetime(2010, 1, 1))  # Allowing older start dates
     end_date = st.sidebar.date_input("End Date", value=datetime.today())
 
     # Format dates for display

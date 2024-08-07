@@ -25,8 +25,13 @@ def get_user_input():
         stock_symbol += ".BO"
 
     # Date range inputs
-    start_date = st.sidebar.date_input("Start Date", value=datetime(1990, 1, 1))  # Allowing start date from 1990
+    start_date = st.sidebar.date_input("Start Date", value=datetime(1980, 1, 1))  # Allowing start date from 1980
     end_date = st.sidebar.date_input("End Date", value=datetime.today())
+
+    # Ensure end_date is not before start_date
+    if end_date < start_date:
+        st.sidebar.error("End date cannot be before start date.")
+        end_date = start_date
 
     # Format dates for display
     formatted_start_date = start_date.strftime("%d/%m/%Y")

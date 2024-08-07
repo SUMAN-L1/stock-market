@@ -34,7 +34,7 @@ stock_symbol, period, interval = get_user_input()
 # Fetch stock data
 @st.cache_data
 def load_data(symbol, period, interval):
-    return yf.download(symbol, period=period, interval=interval)
+    return yf.download(symbol, period=period, interval=interval, progress=False)
 
 data = load_data(stock_symbol, period, interval)
 

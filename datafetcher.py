@@ -72,7 +72,10 @@ def load_data(symbol, start_date, end_date, interval):
         # Check if the data is within the requested range
         if data.empty or data.index[0] > end_date_ts or data.index[-1] < start_date_ts:
             return pd.DataFrame()  # Return empty DataFrame if no data in the selected range
-        
+
+        # Reset index to include Date as a column
+        data = data.reset_index()
+
         return data
     except Exception as e:
         st.error(f"An error occurred: {e}")
@@ -88,7 +91,7 @@ if not data.empty:
 
     # Plot stock data
     st.subheader("Stock Closing Price")
-    st.line_chart(data['Close'])
+    st.line_chart(data.set_index('Date')['Close'])
 
     # Display descriptive statistics
     st.subheader("Descriptive Statistics")
@@ -97,7 +100,7 @@ if not data.empty:
     # Function to convert DataFrame to different formats
     def convert_df(df, file_format):
         if file_format == "csv":
-            return df.to_csv().encode('utf-8')
+            return df.to_csv(index=False).encode('utf-8')
         elif file_format == "xlsx":
             output = BytesIO()
             with pd.ExcelWriter(output, engine='openpyxl') as writer:

@@ -24,8 +24,15 @@ def get_user_input():
     elif exchange == "BSE":
         stock_symbol += ".BO"
 
-    # Date range inputs
-    start_date = st.sidebar.date_input("Start Date", value=datetime(1980, 1, 1))  # Allowing start date from 1980
+    # Select start date using dropdowns
+    start_year = st.sidebar.selectbox("Start Year", list(range(1980, 2025)), index=2024 - 1980)
+    start_month = st.sidebar.selectbox("Start Month", list(range(1, 13)), index=datetime.now().month - 1)
+    start_day = st.sidebar.selectbox("Start Day", list(range(1, 32)), index=datetime.now().day - 1)
+
+    # Convert selected date to datetime.date
+    start_date = datetime(start_year, start_month, start_day)
+
+    # Select end date
     end_date = st.sidebar.date_input("End Date", value=datetime.today())
 
     # Ensure end_date is not before start_date

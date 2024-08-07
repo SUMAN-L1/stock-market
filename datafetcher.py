@@ -50,7 +50,11 @@ stock_symbol, start_date, end_date, interval = get_user_input()
 @st.cache_data
 def load_data(symbol, start_date, end_date, interval):
     try:
-        return yf.download(symbol, start=start_date, end=end_date, interval=interval, progress=False)
+        data = yf.download(symbol, start=start_date, end=end_date, interval=interval, progress=False)
+        # Check if the data is within the requested range
+        if data.empty or data.index[0] > end_date or data.index[-1] < start_date:
+            return pd.DataFrame()  # Return empty DataFrame if no data in the selected range
+        return data
     except Exception as e:
         st.error(f"An error occurred: {e}")
         return pd.DataFrame()  # Return empty DataFrame in case of an error
@@ -100,4 +104,4 @@ if not data.empty:
         elif file_format == "slx":
             st.download_button(label="Download as SLX", data=file_data, file_name=f"{stock_symbol}_data.slx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 else:
-    st.warning("No data available for the selected parameters.")
+    st.warning("No data available for the selected period.")

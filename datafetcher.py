@@ -12,7 +12,7 @@ st.sidebar.header("User Input Parameters")
 # Function to get user input
 def get_user_input():
     # Select stock
-    stock_symbol = st.sidebar.text_input("Stock Symbol", "CANBK")
+    stock_symbol = st.sidebar.text_input("Stock Symbol (e.g., RELIANCE.NS for NSE, TCS.BO for BSE)", "RELIANCE.NS")
 
     # Select period
     period = st.sidebar.selectbox(

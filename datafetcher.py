@@ -25,7 +25,7 @@ def get_user_input():
         stock_symbol += ".BO"
 
     # Date range inputs
-    start_date = st.sidebar.date_input("Start Date", value=datetime(1980, 1, 1))  # Allowing older start dates
+    start_date = st.sidebar.date_input("Start Date", value=datetime(1980, 1, 1))  # Allowing start date from 1980
     end_date = st.sidebar.date_input("End Date", value=datetime.today())
 
     # Format dates for display
@@ -49,47 +49,55 @@ stock_symbol, start_date, end_date, interval = get_user_input()
 # Fetch stock data
 @st.cache_data
 def load_data(symbol, start_date, end_date, interval):
-    return yf.download(symbol, start=start_date, end=end_date, interval=interval, progress=False)
+    try:
+        return yf.download(symbol, start=start_date, end=end_date, interval=interval, progress=False)
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
+        return pd.DataFrame()  # Return empty DataFrame in case of an error
 
 data = load_data(stock_symbol, start_date, end_date, interval)
 
-# Display stock data
-st.subheader(f"Stock Data for {stock_symbol}")
-st.write(data)
+# Check if data is empty
+if not data.empty:
+    # Display stock data
+    st.subheader(f"Stock Data for {stock_symbol}")
+    st.write(data)
 
-# Plot stock data
-st.subheader("Stock Closing Price")
-st.line_chart(data['Close'])
+    # Plot stock data
+    st.subheader("Stock Closing Price")
+    st.line_chart(data['Close'])
 
-# Display descriptive statistics
-st.subheader("Descriptive Statistics")
-st.write(data.describe())
+    # Display descriptive statistics
+    st.subheader("Descriptive Statistics")
+    st.write(data.describe())
 
-# Function to convert DataFrame to different formats
-def convert_df(df, file_format):
-    if file_format == "csv":
-        return df.to_csv().encode('utf-8')
-    elif file_format == "xlsx":
-        output = BytesIO()
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            df.to_excel(writer, index=False, sheet_name='Sheet1')
-        return output.getvalue()
-    elif file_format == "slx":
-        output = BytesIO()
-        df.to_excel(output, index=False, sheet_name='Sheet1')
-        return output.getvalue()
-    else:
-        raise ValueError("Unsupported file format")
+    # Function to convert DataFrame to different formats
+    def convert_df(df, file_format):
+        if file_format == "csv":
+            return df.to_csv().encode('utf-8')
+        elif file_format == "xlsx":
+            output = BytesIO()
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                df.to_excel(writer, index=False, sheet_name='Sheet1')
+            return output.getvalue()
+        elif file_format == "slx":
+            output = BytesIO()
+            df.to_excel(output, index=False, sheet_name='Sheet1')
+            return output.getvalue()
+        else:
+            raise ValueError("Unsupported file format")
 
-# Download data
-st.subheader("Download Historical Data")
-file_format = st.selectbox("Select File Format", ("csv", "xlsx", "slx"))
+    # Download data
+    st.subheader("Download Historical Data")
+    file_format = st.selectbox("Select File Format", ("csv", "xlsx", "slx"))
 
-if st.button("Download"):
-    file_data = convert_df(data, file_format)
-    if file_format == "csv":
-        st.download_button(label="Download as CSV", data=file_data, file_name=f"{stock_symbol}_data.csv", mime="text/csv")
-    elif file_format == "xlsx":
-        st.download_button(label="Download as XLSX", data=file_data, file_name=f"{stock_symbol}_data.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    elif file_format == "slx":
-        st.download_button(label="Download as SLX", data=file_data, file_name=f"{stock_symbol}_data.slx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    if st.button("Download"):
+        file_data = convert_df(data, file_format)
+        if file_format == "csv":
+            st.download_button(label="Download as CSV", data=file_data, file_name=f"{stock_symbol}_data.csv", mime="text/csv")
+        elif file_format == "xlsx":
+            st.download_button(label="Download as XLSX", data=file_data, file_name=f"{stock_symbol}_data.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        elif file_format == "slx":
+            st.download_button(label="Download as SLX", data=file_data, file_name=f"{stock_symbol}_data.slx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+else:
+    st.warning("No data available for the selected parameters.")
